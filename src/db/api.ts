@@ -64,17 +64,25 @@ export async function updateProfileRole(userId: string, role: 'admin' | 'holder'
 // ============================================================================
 
 export async function getSystemSettings(): Promise<SystemSettings | null> {
-  const { data, error } = await supabase
-    .from('system_settings')
-    .select('*')
-    .eq('id', 1)
-    .maybeSingle();
+  try {
+    console.log('getSystemSettings: Fetching from database...');
+    const { data, error } = await supabase
+      .from('system_settings')
+      .select('*')
+      .eq('id', 1)
+      .maybeSingle();
 
-  if (error) {
-    console.error('Error fetching system settings:', error);
+    if (error) {
+      console.error('getSystemSettings: Error fetching system settings:', error);
+      return null;
+    }
+    
+    console.log('getSystemSettings: Data retrieved:', data);
+    return data;
+  } catch (error) {
+    console.error('getSystemSettings: Exception caught:', error);
     return null;
   }
-  return data;
 }
 
 export async function updateAdminAccessCode(newCode: string): Promise<boolean> {
@@ -91,8 +99,23 @@ export async function updateAdminAccessCode(newCode: string): Promise<boolean> {
 }
 
 export async function verifyAdminAccessCode(code: string): Promise<boolean> {
-  const settings = await getSystemSettings();
-  return settings?.admin_access_code === code;
+  try {
+    console.log('verifyAdminAccessCode called with code:', code);
+    const settings = await getSystemSettings();
+    console.log('System settings retrieved:', settings);
+    
+    if (!settings) {
+      console.error('System settings is null');
+      return false;
+    }
+    
+    const isMatch = settings.admin_access_code === code;
+    console.log('Code match result:', isMatch, 'Expected:', settings.admin_access_code, 'Got:', code);
+    return isMatch;
+  } catch (error) {
+    console.error('Error in verifyAdminAccessCode:', error);
+    return false;
+  }
 }
 
 // ============================================================================
