@@ -11,6 +11,7 @@ import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import AdminSettingsPage from './pages/admin/AdminSettingsPage';
 import AdminHoldersPage from './pages/admin/AdminHoldersPage';
 import AdminAssetsPage from './pages/admin/AdminAssetsPage';
+import AdminActiveAssetsPage from './pages/admin/AdminActiveAssetsPage';
 import AdminApprovalsPage from './pages/admin/AdminApprovalsPage';
 import AdminHistoryPage from './pages/admin/AdminHistoryPage';
 import AdminCommissionsPage from './pages/admin/AdminCommissionsPage';
@@ -63,6 +64,11 @@ const routes: RouteConfig[] = [
         name: 'Admin Assets',
         path: '/admin/assets',
         element: <AdminAssetsPage />,
+      },
+      {
+        name: 'Admin Active Assets',
+        path: '/admin/active-assets',
+        element: <AdminActiveAssetsPage />,
       },
       {
         name: 'Admin Approvals',

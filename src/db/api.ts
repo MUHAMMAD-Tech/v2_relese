@@ -388,6 +388,12 @@ export async function createAsset(assetData: AssetFormData): Promise<boolean> {
     console.error('Error creating asset:', error);
     return false;
   }
+  
+  // Clear active assets cache
+  if (typeof clearActiveAssetsCache === 'function') {
+    clearActiveAssetsCache();
+  }
+  
   return true;
 }
 
@@ -404,6 +410,12 @@ export async function updateAsset(assetId: string, updates: { amount: number }):
     console.error('Error updating asset:', error);
     return false;
   }
+  
+  // Clear active assets cache
+  if (typeof clearActiveAssetsCache === 'function') {
+    clearActiveAssetsCache();
+  }
+  
   return true;
 }
 
@@ -417,6 +429,12 @@ export async function deleteAssetById(assetId: string): Promise<boolean> {
     console.error('Error deleting asset:', error);
     return false;
   }
+  
+  // Clear active assets cache
+  if (typeof clearActiveAssetsCache === 'function') {
+    clearActiveAssetsCache();
+  }
+  
   return true;
 }
 
@@ -964,6 +982,151 @@ export async function getCommissionSummary() {
   }
 
   return Array.isArray(data) ? data : [];
+}
+
+// ============================================================================
+// ACTIVE ASSETS AGGREGATION
+// ============================================================================
+
+export interface AssetHolderBreakdown {
+  holderId: string;
+  holderName: string;
+  holderAccessCode: string;
+  amount: string;
+  usdValue: number;
+}
+
+export interface ActiveAssetData {
+  symbol: string;
+  name: string;
+  logoUrl: string;
+  totalAmount: string;
+  priceUsd: number;
+  totalUsdValue: number;
+  totalKgsValue: number;
+  holders: AssetHolderBreakdown[];
+}
+
+export interface ActiveAssetsResponse {
+  totalUsd: number;
+  totalKgs: number;
+  assets: ActiveAssetData[];
+  lastUpdated: string;
+}
+
+let activeAssetsCache: { data: ActiveAssetsResponse | null; timestamp: number } = {
+  data: null,
+  timestamp: 0,
+};
+
+const CACHE_DURATION = 10000; // 10 seconds
+
+export async function getActiveAssets(): Promise<ActiveAssetsResponse> {
+  // Check cache
+  const now = Date.now();
+  if (activeAssetsCache.data && (now - activeAssetsCache.timestamp) < CACHE_DURATION) {
+    return activeAssetsCache.data;
+  }
+
+  try {
+    // Get all assets with holder information
+    const { data: assetsData, error: assetsError } = await supabase
+      .from('assets')
+      .select(`
+        id,
+        holder_id,
+        token_symbol,
+        amount,
+        holder:holders!assets_holder_id_fkey(id, name, access_code)
+      `)
+      .gt('amount', '0');
+
+    if (assetsError) {
+      console.error('Error fetching assets:', assetsError);
+      return { totalUsd: 0, totalKgs: 0, assets: [], lastUpdated: new Date().toISOString() };
+    }
+
+    // Get all tokens for metadata
+    const { data: tokensData, error: tokensError } = await supabase
+      .from('token_whitelist')
+      .select('symbol, name, logo_url, coingecko_id');
+
+    if (tokensError) {
+      console.error('Error fetching tokens:', tokensError);
+    }
+
+    const tokens = tokensData || [];
+
+    // Group assets by token symbol
+    const assetsBySymbol: { [symbol: string]: typeof assetsData } = {};
+    
+    if (assetsData) {
+      assetsData.forEach((asset: any) => {
+        if (!assetsBySymbol[asset.token_symbol]) {
+          assetsBySymbol[asset.token_symbol] = [];
+        }
+        assetsBySymbol[asset.token_symbol].push(asset);
+      });
+    }
+
+    // Get current prices from appStore (this will be populated by the frontend)
+    // For now, we'll return the structure and let the frontend calculate with live prices
+    const assets: ActiveAssetData[] = Object.keys(assetsBySymbol).map((symbol) => {
+      const tokenAssets = assetsBySymbol[symbol];
+      const token = tokens.find(t => t.symbol === symbol);
+      
+      // Calculate total amount
+      const totalAmount = tokenAssets.reduce((sum, asset) => {
+        return sum + parseFloat(asset.amount || '0');
+      }, 0);
+
+      // Build holders breakdown
+      const holders: AssetHolderBreakdown[] = tokenAssets.map((asset: any) => {
+        const holder = Array.isArray(asset.holder) ? asset.holder[0] : asset.holder;
+        return {
+          holderId: asset.holder_id,
+          holderName: holder?.name || 'Unknown',
+          holderAccessCode: holder?.access_code || '',
+          amount: asset.amount,
+          usdValue: 0, // Will be calculated on frontend with live prices
+        };
+      }).filter((h: AssetHolderBreakdown) => parseFloat(h.amount) > 0);
+
+      return {
+        symbol,
+        name: token?.name || symbol,
+        logoUrl: token?.logo_url || '',
+        totalAmount: totalAmount.toFixed(8),
+        priceUsd: 0, // Will be populated on frontend
+        totalUsdValue: 0, // Will be calculated on frontend
+        totalKgsValue: 0, // Will be calculated on frontend
+        holders,
+      };
+    });
+
+    const result: ActiveAssetsResponse = {
+      totalUsd: 0, // Will be calculated on frontend
+      totalKgs: 0, // Will be calculated on frontend
+      assets,
+      lastUpdated: new Date().toISOString(),
+    };
+
+    // Cache the result
+    activeAssetsCache = {
+      data: result,
+      timestamp: now,
+    };
+
+    return result;
+  } catch (error) {
+    console.error('Error in getActiveAssets:', error);
+    return { totalUsd: 0, totalKgs: 0, assets: [], lastUpdated: new Date().toISOString() };
+  }
+}
+
+// Clear cache when assets are modified
+export function clearActiveAssetsCache() {
+  activeAssetsCache = { data: null, timestamp: 0 };
 }
 
 // ============================================================================

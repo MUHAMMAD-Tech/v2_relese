@@ -17,6 +17,7 @@ import {
   Menu,
   LogOut,
   LayoutDashboard,
+  PieChart,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -32,6 +33,7 @@ export function AdminLayout() {
     { name: t('admin.settings'), href: '/admin/settings', icon: Settings },
     { name: t('admin.holders'), href: '/admin/holders', icon: Users },
     { name: t('admin.assets'), href: '/admin/assets', icon: Wallet },
+    { name: 'Active Assets', href: '/admin/active-assets', icon: PieChart },
     { name: t('admin.approvals'), href: '/admin/approvals', icon: CheckCircle },
     { name: t('admin.history'), href: '/admin/history', icon: History },
     { name: t('admin.commissions'), href: '/admin/commissions', icon: DollarSign },
