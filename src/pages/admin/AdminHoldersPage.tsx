@@ -13,8 +13,8 @@ import {
 } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
-import { Plus, Edit, Trash2, Copy, Check } from 'lucide-react';
-import { getAllHolders, createHolder, updateHolder, deleteHolder } from '@/db/api';
+import { Plus, Edit, Trash2, Copy, Check, Key, RefreshCw } from 'lucide-react';
+import { getAllHolders, createHolder, updateHolder, deleteHolder, updateHolderAccessCode, generateAccessCode } from '@/db/api';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import type { Holder, HolderFormData } from '@/types/types';
 
@@ -24,12 +24,14 @@ export default function AdminHoldersPage() {
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showChangeCodeDialog, setShowChangeCodeDialog] = useState(false);
   const [selectedHolder, setSelectedHolder] = useState<Holder | null>(null);
   const [formData, setFormData] = useState<HolderFormData>({
     name: '',
     email: '',
     phone: '',
   });
+  const [newAccessCode, setNewAccessCode] = useState('');
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
   useEffect(() => {
@@ -105,6 +107,39 @@ export default function AdminHoldersPage() {
   const openDeleteDialog = (holder: Holder) => {
     setSelectedHolder(holder);
     setShowDeleteDialog(true);
+  };
+
+  const openChangeCodeDialog = (holder: Holder) => {
+    setSelectedHolder(holder);
+    setNewAccessCode(generateAccessCode());
+    setShowChangeCodeDialog(true);
+  };
+
+  const handleChangeAccessCode = async () => {
+    if (!selectedHolder || !newAccessCode.trim()) {
+      toast.error('Please enter a valid access code');
+      return;
+    }
+
+    if (newAccessCode.length < 6) {
+      toast.error('Access code must be at least 6 characters');
+      return;
+    }
+
+    const success = await updateHolderAccessCode(selectedHolder.id, newAccessCode);
+    if (success) {
+      toast.success('Access code updated successfully');
+      setShowChangeCodeDialog(false);
+      setSelectedHolder(null);
+      setNewAccessCode('');
+      loadHolders();
+    } else {
+      toast.error('Failed to update access code');
+    }
+  };
+
+  const handleGenerateNewCode = () => {
+    setNewAccessCode(generateAccessCode());
   };
 
   const copyAccessCode = (code: string) => {
@@ -190,6 +225,14 @@ export default function AdminHoldersPage() {
                     </div>
                   </div>
                   <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => openChangeCodeDialog(holder)}
+                    >
+                      <Key className="h-4 w-4 @md:mr-2" />
+                      <span className="hidden @md:inline">Change Code</span>
+                    </Button>
                     <Button
                       variant="outline"
                       size="sm"
@@ -311,6 +354,51 @@ export default function AdminHoldersPage() {
               </Button>
               <Button onClick={handleEditHolder} className="flex-1">
                 Save Changes
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Change Access Code Dialog */}
+      <Dialog open={showChangeCodeDialog} onOpenChange={setShowChangeCodeDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Change Access Code</DialogTitle>
+            <DialogDescription>
+              Update the access code for {selectedHolder?.name}. The old code will become invalid immediately.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            <div className="space-y-2">
+              <Label htmlFor="new-access-code">New Access Code</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="new-access-code"
+                  placeholder="Enter new access code"
+                  value={newAccessCode}
+                  onChange={(e) => setNewAccessCode(e.target.value)}
+                  className="flex-1"
+                />
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={handleGenerateNewCode}
+                  title="Generate new code"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Minimum 6 characters. Click the refresh button to generate a random code.
+              </p>
+            </div>
+            <div className="flex gap-2 pt-4">
+              <Button variant="outline" onClick={() => setShowChangeCodeDialog(false)} className="flex-1">
+                Cancel
+              </Button>
+              <Button onClick={handleChangeAccessCode} className="flex-1">
+                Update Code
               </Button>
             </div>
           </div>

@@ -4,6 +4,8 @@ import { motion } from 'motion/react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useAppStore } from '@/store/appStore';
+import { useI18n } from '@/contexts/I18nContext';
+import { Header } from '@/components/common/Header';
 import { toast } from 'sonner';
 import {
   Wallet,
@@ -15,22 +17,23 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-const navigation = [
-  { name: 'Dashboard', href: '/holder/dashboard', icon: LayoutDashboard },
-  { name: 'Portfolio', href: '/holder/portfolio', icon: Wallet },
-  { name: 'Transactions', href: '/holder/transactions', icon: ArrowRightLeft },
-  { name: 'History', href: '/holder/history', icon: History },
-];
-
 export function HolderLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const { currentHolder, clearCurrentHolder } = useAppStore();
+  const { t } = useI18n();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const navigation = [
+    { name: t('admin.dashboard'), href: '/holder/dashboard', icon: LayoutDashboard },
+    { name: t('portfolio.portfolio'), href: '/holder/portfolio', icon: Wallet },
+    { name: t('transactions.transactions'), href: '/holder/transactions', icon: ArrowRightLeft },
+    { name: t('admin.history'), href: '/holder/history', icon: History },
+  ];
 
   const handleExit = () => {
     clearCurrentHolder();
-    toast.success('Session ended');
+    toast.success(t('auth.loginSuccess'));
     navigate('/login');
   };
 
@@ -76,7 +79,7 @@ export function HolderLayout() {
           {/* User Info & Exit */}
           <div className="p-4 border-t border-border">
             <div className="mb-3 px-4 py-2 bg-secondary/50 rounded-lg">
-              <p className="text-xs text-muted-foreground">Logged in as</p>
+              <p className="text-xs text-muted-foreground">{t('auth.login')}</p>
               <p className="text-sm font-semibold text-foreground truncate">
                 {currentHolder?.name || 'Holder'}
               </p>
@@ -87,7 +90,7 @@ export function HolderLayout() {
               onClick={handleExit}
             >
               <LogOut className="mr-2 h-4 w-4" />
-              Exit
+              {t('common.exit')}
             </Button>
           </div>
         </div>
@@ -95,15 +98,22 @@ export function HolderLayout() {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
+        {/* Desktop Header */}
+        <header className="hidden lg:flex items-center justify-end p-4 border-b border-border bg-card">
+          <Header />
+        </header>
+
         {/* Mobile Header */}
         <header className="lg:hidden flex items-center justify-between p-4 border-b border-border bg-card">
           <h1 className="text-xl font-bold gradient-text">LETHEX</h1>
-          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Menu className="h-6 w-6" />
-              </Button>
-            </SheetTrigger>
+          <div className="flex items-center gap-2">
+            <Header />
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-6 w-6" />
+                </Button>
+              </SheetTrigger>
             <SheetContent side="left" className="w-64 p-0">
               <div className="flex flex-col h-full">
                 {/* Logo */}
@@ -131,12 +141,13 @@ export function HolderLayout() {
                     onClick={handleExit}
                   >
                     <LogOut className="mr-2 h-4 w-4" />
-                    Exit
+                    {t('common.exit')}
                   </Button>
                 </div>
               </div>
             </SheetContent>
           </Sheet>
+          </div>
         </header>
 
         {/* Page Content */}

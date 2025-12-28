@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ThemeProvider } from 'next-themes';
 import IntersectObserver from '@/components/common/IntersectObserver';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { I18nProvider } from '@/contexts/I18nContext';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 import { RouteGuard } from '@/components/common/RouteGuard';
 import { Toaster } from 'sonner';
 import { useAppStore } from '@/store/appStore';
@@ -42,16 +43,18 @@ const App: React.FC = () => {
   };
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
-      <Router>
-        <AuthProvider>
-          <RouteGuard>
-            <IntersectObserver />
-            <Routes>{renderRoutes(routes)}</Routes>
-            <Toaster position="top-right" richColors />
-          </RouteGuard>
-        </AuthProvider>
-      </Router>
+    <ThemeProvider>
+      <I18nProvider>
+        <Router>
+          <AuthProvider>
+            <RouteGuard>
+              <IntersectObserver />
+              <Routes>{renderRoutes(routes)}</Routes>
+              <Toaster position="top-right" richColors />
+            </RouteGuard>
+          </AuthProvider>
+        </Router>
+      </I18nProvider>
     </ThemeProvider>
   );
 };

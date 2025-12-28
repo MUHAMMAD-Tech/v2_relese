@@ -255,6 +255,24 @@ function generateAccessCode(): string {
   return code;
 }
 
+export async function updateHolderAccessCode(id: string, newAccessCode: string): Promise<boolean> {
+  const { error } = await supabase
+    .from('holders')
+    .update({
+      access_code: newAccessCode,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', id);
+
+  if (error) {
+    console.error('Error updating holder access code:', error);
+    return false;
+  }
+  return true;
+}
+
+export { generateAccessCode };
+
 // ============================================================================
 // ASSETS
 // ============================================================================

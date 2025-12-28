@@ -11,23 +11,23 @@
 @layer base {
   :root {
     --radius: 0.5rem;
-    /* Light mode (fallback - app is dark-first) */
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
+    /* Light mode - Clean professional theme */
+    --background: 0 0% 98%; /* Light gray background */
+    --foreground: 222.2 84% 4.9%; /* Dark text */
+    --card: 0 0% 100%; /* White cards */
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
     --primary: 194 100% 50%; /* Electric blue #00d4ff */
     --primary-foreground: 0 0% 100%;
-    --secondary: 210 40% 96.1%;
+    --secondary: 210 40% 96.1%; /* Light gray */
     --secondary-foreground: 222.2 47.4% 11.2%;
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
+    --accent: 210 40% 94%; /* Subtle highlight */
     --accent-foreground: 222.2 47.4% 11.2%;
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 194 100% 50%;
@@ -40,13 +40,13 @@
     --chart-3: 38 92% 50%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-    --sidebar-background: 300 0% 98%;
-    --sidebar-foreground: 300 0% 4%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 222.2 84% 4.9%;
     --sidebar-primary: 194 100% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 300 0% 96%;
-    --sidebar-accent-foreground: 330 0% 9%;
-    --sidebar-border: 330 0% 90%;
+    --sidebar-accent: 210 40% 96.1%;
+    --sidebar-accent-foreground: 222.2 47.4% 11.2%;
+    --sidebar-border: 214.3 31.8% 91.4%;
     --sidebar-ring: 194 100% 50%;
   }
 

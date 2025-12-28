@@ -4,6 +4,8 @@ import { motion } from 'motion/react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useAuth } from '@/contexts/AuthContext';
+import { useI18n } from '@/contexts/I18nContext';
+import { Header } from '@/components/common/Header';
 import { toast } from 'sonner';
 import {
   Settings,
@@ -18,25 +20,26 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-const navigation = [
-  { name: 'Boshqaruv paneli', href: '/admin/dashboard', icon: LayoutDashboard },
-  { name: 'Sozlamalar', href: '/admin/settings', icon: Settings },
-  { name: 'Holderlar', href: '/admin/holders', icon: Users },
-  { name: 'Aktivlar', href: '/admin/assets', icon: Wallet },
-  { name: 'Tasdiqlar', href: '/admin/approvals', icon: CheckCircle },
-  { name: 'Tarix', href: '/admin/history', icon: History },
-  { name: 'Komissiyalar', href: '/admin/commissions', icon: DollarSign },
-];
-
 export function AdminLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const { signOut, profile } = useAuth();
+  const { t } = useI18n();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const navigation = [
+    { name: t('admin.dashboard'), href: '/admin/dashboard', icon: LayoutDashboard },
+    { name: t('admin.settings'), href: '/admin/settings', icon: Settings },
+    { name: t('admin.holders'), href: '/admin/holders', icon: Users },
+    { name: t('admin.assets'), href: '/admin/assets', icon: Wallet },
+    { name: t('admin.approvals'), href: '/admin/approvals', icon: CheckCircle },
+    { name: t('admin.history'), href: '/admin/history', icon: History },
+    { name: t('admin.commissions'), href: '/admin/commissions', icon: DollarSign },
+  ];
 
   const handleLogout = async () => {
     await signOut();
-    toast.success('Tizimdan muvaffaqiyatli chiqdingiz');
+    toast.success(t('auth.loginSuccess'));
     navigate('/login');
   };
 
@@ -82,7 +85,7 @@ export function AdminLayout() {
           {/* User Info & Logout */}
           <div className="p-4 border-t border-border">
             <div className="mb-3 px-4 py-2 bg-secondary/50 rounded-lg">
-              <p className="text-xs text-muted-foreground">Tizimga kirgan</p>
+              <p className="text-xs text-muted-foreground">{t('auth.login')}</p>
               <p className="text-sm font-semibold text-foreground">Admin</p>
             </div>
             <Button
@@ -91,7 +94,7 @@ export function AdminLayout() {
               onClick={handleLogout}
             >
               <LogOut className="mr-2 h-4 w-4" />
-              Chiqish
+              {t('common.exit')}
             </Button>
           </div>
         </div>
@@ -99,46 +102,54 @@ export function AdminLayout() {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
+        {/* Desktop Header */}
+        <header className="hidden lg:flex items-center justify-end p-4 border-b border-border bg-card">
+          <Header />
+        </header>
+
         {/* Mobile Header */}
         <header className="lg:hidden flex items-center justify-between p-4 border-b border-border bg-card">
           <h1 className="text-xl font-bold gradient-text">LETHEX</h1>
-          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Menu className="h-6 w-6" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-64 p-0">
-              <div className="flex flex-col h-full">
-                {/* Logo */}
-                <div className="p-6 border-b border-border">
-                  <h1 className="text-2xl font-bold gradient-text">LETHEX</h1>
-                  <p className="text-xs text-muted-foreground mt-1">Admin paneli</p>
-                </div>
-
-                {/* Navigation */}
-                <nav className="flex-1 p-4 space-y-2">
-                  <NavLinks />
-                </nav>
-
-                {/* User Info & Logout */}
-                <div className="p-4 border-t border-border">
-                  <div className="mb-3 px-4 py-2 bg-secondary/50 rounded-lg">
-                    <p className="text-xs text-muted-foreground">Tizimga kirgan</p>
-                    <p className="text-sm font-semibold text-foreground">Admin</p>
+          <div className="flex items-center gap-2">
+            <Header />
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-6 w-6" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-64 p-0">
+                <div className="flex flex-col h-full">
+                  {/* Logo */}
+                  <div className="p-6 border-b border-border">
+                    <h1 className="text-2xl font-bold gradient-text">LETHEX</h1>
+                    <p className="text-xs text-muted-foreground mt-1">Admin paneli</p>
                   </div>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start"
-                    onClick={handleLogout}
-                  >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Chiqish
-                  </Button>
+
+                  {/* Navigation */}
+                  <nav className="flex-1 p-4 space-y-2">
+                    <NavLinks />
+                  </nav>
+
+                  {/* User Info & Logout */}
+                  <div className="p-4 border-t border-border">
+                    <div className="mb-3 px-4 py-2 bg-secondary/50 rounded-lg">
+                      <p className="text-xs text-muted-foreground">{t('auth.login')}</p>
+                      <p className="text-sm font-semibold text-foreground">Admin</p>
+                    </div>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start"
+                      onClick={handleLogout}
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      {t('common.exit')}
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </SheetContent>
-          </Sheet>
+              </SheetContent>
+            </Sheet>
+          </div>
         </header>
 
         {/* Page Content */}
