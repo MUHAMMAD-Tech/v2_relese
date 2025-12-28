@@ -12,9 +12,12 @@ import AdminSettingsPage from './pages/admin/AdminSettingsPage';
 import AdminHoldersPage from './pages/admin/AdminHoldersPage';
 import AdminAssetsPage from './pages/admin/AdminAssetsPage';
 import AdminApprovalsPage from './pages/admin/AdminApprovalsPage';
+import AdminHistoryPage from './pages/admin/AdminHistoryPage';
+import AdminCommissionsPage from './pages/admin/AdminCommissionsPage';
 import HolderDashboardPage from './pages/holder/HolderDashboardPage';
 import HolderPortfolioPage from './pages/holder/HolderPortfolioPage';
 import HolderTransactionsPage from './pages/holder/HolderTransactionsPage';
+import HolderHistoryPage from './pages/holder/HolderHistoryPage';
 import NotFound from './pages/NotFound';
 
 interface RouteConfig {
@@ -69,12 +72,12 @@ const routes: RouteConfig[] = [
       {
         name: 'Admin History',
         path: '/admin/history',
-        element: <div>History Page - Coming Soon</div>,
+        element: <AdminHistoryPage />,
       },
       {
         name: 'Admin Commissions',
         path: '/admin/commissions',
-        element: <div>Commissions Page - Coming Soon</div>,
+        element: <AdminCommissionsPage />,
       },
     ],
   },
@@ -101,7 +104,7 @@ const routes: RouteConfig[] = [
       {
         name: 'Holder History',
         path: '/holder/history',
-        element: <div>History Page - Coming Soon</div>,
+        element: <HolderHistoryPage />,
       },
     ],
   },

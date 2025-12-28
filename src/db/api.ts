@@ -948,12 +948,15 @@ export async function getCommissionSummary() {
       id,
       holder_id,
       fee,
+      from_token,
       transaction_type,
       status,
+      requested_at,
       holder:holders!transactions_holder_id_fkey(name)
     `)
     .eq('status', 'approved')
-    .eq('transaction_type', 'swap');
+    .eq('transaction_type', 'swap')
+    .order('requested_at', { ascending: false });
 
   if (error) {
     console.error('Error fetching commission data:', error);
@@ -961,4 +964,66 @@ export async function getCommissionSummary() {
   }
 
   return Array.isArray(data) ? data : [];
+}
+
+// ============================================================================
+// HISTORY / APPROVED TRANSACTIONS
+// ============================================================================
+
+export async function getApprovedTransactions(): Promise<TransactionWithDetails[]> {
+  const { data, error } = await supabase
+    .from('transactions')
+    .select(`
+      *,
+      holder:holders!transactions_holder_id_fkey(*),
+      from_token_data:token_whitelist!transactions_from_token_fkey(*),
+      to_token_data:token_whitelist!transactions_to_token_fkey(*)
+    `)
+    .in('status', ['approved', 'rejected'])
+    .order('approved_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching approved transactions:', error);
+    return [];
+  }
+  return Array.isArray(data) ? data : [];
+}
+
+export async function getApprovedTransactionsByHolderId(holderId: string): Promise<TransactionWithDetails[]> {
+  const { data, error } = await supabase
+    .from('transactions')
+    .select(`
+      *,
+      holder:holders!transactions_holder_id_fkey(*),
+      from_token_data:token_whitelist!transactions_from_token_fkey(*),
+      to_token_data:token_whitelist!transactions_to_token_fkey(*)
+    `)
+    .eq('holder_id', holderId)
+    .in('status', ['approved', 'rejected'])
+    .order('approved_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching holder approved transactions:', error);
+    return [];
+  }
+  return Array.isArray(data) ? data : [];
+}
+
+export async function getTransactionById(transactionId: string): Promise<TransactionWithDetails | null> {
+  const { data, error } = await supabase
+    .from('transactions')
+    .select(`
+      *,
+      holder:holders!transactions_holder_id_fkey(*),
+      from_token_data:token_whitelist!transactions_from_token_fkey(*),
+      to_token_data:token_whitelist!transactions_to_token_fkey(*)
+    `)
+    .eq('id', transactionId)
+    .maybeSingle();
+
+  if (error) {
+    console.error('Error fetching transaction by ID:', error);
+    return null;
+  }
+  return data;
 }

@@ -27,7 +27,8 @@ LETHEX is a digital asset fund viewer and manual management system designed for 
 - REST API architecture
 - Token registry system
 \n### 2.3 External APIs
-- CoinGecko public API\n- Price refresh interval: 1 second
+- CoinGecko public API
+- Price refresh interval: 1 second
 - Backend caching with fail-safe mechanism
 
 ## 3. Access Control System
@@ -36,11 +37,9 @@ LETHEX is a digital asset fund viewer and manual management system designed for 
 - Default admin access code: Muso2909 (temporary, first-time use only)
 - Single unified login input for both admin and holders
 - No separate /admin route
-
-### 3.2 Access Code Logic
+\n### 3.2 Access Code Logic
 - Admin access code checked first
-- If match → Admin Panel
-- If holder code match → Holder Dashboard
+- If match → Admin Panel\n- If holder code match → Holder Dashboard
 - If no match → 'Invalid access code' error
 
 ### 3.3 Admin Code Management
@@ -63,17 +62,20 @@ LETHEX is a digital asset fund viewer and manual management system designed for 
 - On server startup:\n  - If tokens table is empty → auto-insert DEFAULT Top-50 native coins
 - Token source priority:
   1. CoinGecko API (top by market cap)
-  2. Cached data
-  3. Hardcoded fallback Top-50 list\n- Each token record contains:
+  2. Cached data\n  3. Hardcoded fallback Top-50 list
+- Each token record contains:
   - symbol
   - name
   - icon URL
-  - market cap rank\n  - enabled = true
+  - market cap rank
+  - enabled = true
 - API endpoint: GET /api/tokens
 - API MUST NEVER return empty array
 - If API fails → use cache or fallback
-\n### 4.2 Allowed Tokens (Top 50 Native Coins Only)
-1. BTC – Bitcoin\n2. ETH – Ethereum
+
+### 4.2 Allowed Tokens (Top 50 Native Coins Only)
+1. BTC – Bitcoin
+2. ETH – Ethereum
 3. USDT – Tether
 4. BNB – Binance Coin
 5. SOL – Solana
@@ -81,8 +83,8 @@ LETHEX is a digital asset fund viewer and manual management system designed for 
 7. XRP – XRP
 8. TON – Toncoin
 9. ADA – Cardano
-10. DOGE – Dogecoin\n11. AVAX – Avalanche
-12. TRX – TRON
+10. DOGE – Dogecoin
+11. AVAX – Avalanche\n12. TRX – TRON
 13. DOT – Polkadot
 14. MATIC – Polygon
 15. LINK – Chainlink
@@ -91,39 +93,42 @@ LETHEX is a digital asset fund viewer and manual management system designed for 
 18. LTC – Litecoin
 19. BCH – Bitcoin Cash
 20. ATOM – Cosmos
-21. XLM – Stellar\n22. UNI – Uniswap
+21. XLM – Stellar
+22. UNI – Uniswap
 23. ETC – Ethereum Classic
 24. XMR – Monero
-25. OKB – OKB
-26. APT – Aptos
+25. OKB – OKB\n26. APT – Aptos
 27. HBAR – Hedera
-28. FIL – Filecoin
-29. ARB – Arbitrum\n30. VET – VeChain
+28. FIL – Filecoin\n29. ARB – Arbitrum
+30. VET – VeChain
 31. QNT – Quant
-32. MKR – Maker\n33. CRO – Cronos
+32. MKR – Maker
+33. CRO – Cronos
 34. ALGO – Algorand
-35. AAVE – Aave\n36. GRT – The Graph
+35. AAVE – Aave
+36. GRT – The Graph
 37. EOS – EOS
 38. FTM – Fantom
 39. THETA – Theta
-40. XTZ – Tezos
-41. IMX – Immutable
+40. XTZ – Tezos\n41. IMX – Immutable
 42. INJ – Injective
-43. OP – Optimism\n44. RNDR – Render
+43. OP – Optimism
+44. RNDR – Render
 45. KAVA – Kava
 46. ZEC – Zcash
 47. MINA – Mina
 48. DASH – Dash
-49. IOTA – IOTA\n50. CAKE – PancakeSwap
+49. IOTA – IOTA
+50. CAKE – PancakeSwap
 
 ### 4.3 Token Restrictions
 - NO wrapped tokens
 - NO staked tokens
-- NO LP tokens\n- NO synthetic or derivative tokens
+- NO LP tokens
+- NO synthetic or derivative tokens
 - Whitelist enforced at backend level
 - Non-whitelisted tokens: not rendered, not selectable, not assignable
-
-### 4.4 Token Selector UI
+\n### 4.4 Token Selector UI
 - Fetch tokens ONLY from backend (/api/tokens)
 - Store tokens in global state
 - Modal-based selection interface
@@ -140,22 +145,20 @@ LETHEX is a digital asset fund viewer and manual management system designed for 
 - Smooth scrolling on Android and desktop
 - Solid backgrounds (no transparency)
 - Tokens MUST appear on first open
-- 'No tokens found' ONLY if search filter returns zero results\n- Native coins selectable on mobile & desktop
+- 'No tokens found' ONLY if search filter returns zero results
+- Native coins selectable on mobile & desktop
 
 ## 5. Internationalization (i18n)
 
 ### 5.1 Supported Languages
 - English (EN) — default
-- Uzbek (UZ)
-- Russian (RU)
-
-### 5.2 Implementation
+- Uzbek (UZ)\n- Russian (RU)
+\n### 5.2 Implementation
 - JSON-based i18n system
 - Localization files:\n  - /locales/en.json
   - /locales/uz.json
   - /locales/ru.json
-- No hardcoded text in components
-- Language applies to entire app
+- No hardcoded text in components\n- Language applies to entire app
 \n### 5.3 Language Switcher UI
 - Dropdown selector (EN / UZ / RU)
 - Visible in header
@@ -174,32 +177,32 @@ LETHEX is a digital asset fund viewer and manual management system designed for 
 - Tailwind class-based theming
 - Apply theme class on <html> or <body>
 - Entire app switches theme
-- No mixed colors
-- Smooth transition animations
+- No mixed colors\n- Smooth transition animations
 
 ### 6.3 Theme Toggle UI
 - Toggle button with Sun/Moon icon
 - Visible in header
-- Mobile friendly\n- Clear visual feedback
+- Mobile friendly
+- Clear visual feedback
 
-### 6.4 Persistence
-- Save theme choice in localStorage
+### 6.4 Persistence\n- Save theme choice in localStorage
 - Refresh MUST NOT reset theme
 - Theme persists across sessions
 
 ## 7. Admin Panel Features
 
-### 7.1 Settings
-- Change admin access code
+### 7.1 Settings\n- Change admin access code
 - System configuration
-\n### 7.2 Holder Management
+
+### 7.2 Holder Management
 - Add new holders
 - Edit holder information
 - Delete holders
 - Auto-generate unique holder access codes
 - **Change holder access codes:**
   - Button: 'Change Access Code'
-  - Generate new random code OR manual input\n  - Save to backend database
+  - Generate new random code OR manual input
+  - Save to backend database
   - Old code becomes INVALID immediately
   - No duplicate access codes allowed
   - Active sessions using old code invalidated
@@ -213,14 +216,10 @@ LETHEX is a digital asset fund viewer and manual management system designed for 
 - Approve buy requests
 - Handle sell requests manually
 - Enter execution prices for swaps
-
-### 7.5 History & Reporting
-- View complete transaction history
-- View commission summary:\n  - Total fees in USDT and KGS
-  - Per-holder breakdown
-  - Date and time stamps
-
-## 8. Holder Dashboard Features
+\n### 7.5 History & Reporting
+- View complete transaction history (see Section 13)
+- View commission summary (see Section 12)
+\n## 8. Holder Dashboard Features
 
 ### 8.1 Portfolio View
 - View assigned assets
@@ -229,7 +228,8 @@ LETHEX is a digital asset fund viewer and manual management system designed for 
 - Submit swap requests
 - Submit buy requests
 - Submit sell requests
-\n### 8.3 History\n- View personal transaction history
+\n### 8.3 History
+- View personal transaction history (see Section 13)
 - Click for detailed transaction information
 
 ## 9. Swap System
@@ -254,48 +254,164 @@ LETHEX is a digital asset fund viewer and manual management system designed for 
 - Admin enters execution price manually
 - Admin approves swap
 - Balances update atomically
-\n## 10. Buy System
+- History record created after approval
+
+## 10. Buy System
 
 ### 10.1 Buy Flow
 - Holder submits buy request
 - Admin reviews request
 - Admin approves and adds asset to holder portfolio
-\n## 11. Sell System
+- History record created after approval
+
+## 11. Sell System
 
 ### 11.1 Sell Flow
 - Holder submits sell request
 - System displays message: 'Please contact admin via Telegram'
 - Admin adjusts balances manually after off-platform confirmation
+- History record created after acknowledgment
 
 ## 12. Commission System
-
-### 12.1 Fee Collection
+\n### 12.1 Fee Collection
 - 1% fee collected on each swap transaction
 - Fees stored per transaction in database
-
-### 12.2 Commission Reporting
-- Total fees displayed in USDT and KGS
-- Per-holder fee breakdown
-- Transaction date and time tracking
-
-## 13. Transaction History
-
-### 13.1 History Entry Fields
+\n### 12.2 Commission Reporting (Admin Only)
+\n#### 12.2.1 Backend Implementation
+- Commission data comes from approved transactions
+- Commission = feeAmount
+\n**API Endpoint:**
+\nGET /api/commissions\n
+**Response Structure:**
+```json
+{\n  'totalCommission': number (USDT),
+  'breakdown': {
+    'swap': number,
+    'buy': number,
+    'sell': number
+  },
+  'list': [
+    {
+      'transactionId': string,
+      'holderName': string,
+      'type': 'swap' | 'buy' | 'sell',
+      'asset': string,
+      'feePercent': number,
+      'feeAmount': number,
+      'createdAt': timestamp
+    }
+  ]
+}
+```
+\n#### 12.2.2 Frontend Implementation
+\n**Page Structure:**
+\n**Top Summary Section:**
+- Total commissions collected (USDT)
+- Breakdown by transaction type:\n  - Swap fees
+  - Buy fees
+  - Sell fees
+\n**Commission List:**
+- Date
 - Holder name
-- Action type (Swap / Buy / Sell)
-- From asset → To asset
+- Transaction type\n- Asset
+- Fee percentage
+- Fee amount (USDT)
+
+**Filters:**
+- Search by holder name
+\n**Empty State:**
+- If no commissions: display 'No commissions collected yet'
+\n**Mobile Layout:**
+- Card-based layout
+- Scrollable list
+- No overlapping text
+- Touch-friendly elements
+
+**Desktop Layout:**
+- Table format
+- Sortable columns
+- Clear visual hierarchy
+\n## 13. Transaction History\n
+### 13.1 History Creation Rules
+- History records created ONLY after:\n  - Swap approved
+  - Buy approved
+  - Sell acknowledged
+
+### 13.2 History Entry Fields
+- id (transaction id)
+- type: swap | buy | sell
+- holderName
+- fromAsset
+- toAsset (nullable for buy/sell)
+- amountFrom
+- amountTo\n- feePercent
+- feeAmount\n- priceUsed (execution price)
+- status\n- createdAt (requested timestamp)
+- approvedAt (approved timestamp)
+\n### 13.3 Backend API
+\n**GET /api/history**
+- Admin → returns ALL history
+- Holder → returns ONLY own history
+\n**GET /api/history/:id**\n- Returns full transaction details
+\n### 13.4 History Page UI (Admin)\n
+**Search Functionality:**
+- Search input at top of page
+- Search by:\n  - Holder name
+  - Transaction ID
+\n**List/Table Display:**
+- Date\n- Holder name
+- Transaction type
+- Assets (FROM → TO)
 - Amount
-- Fee
+- Fee\n- Status
+\n**Mobile Layout:**
+- Card-based layout
+- Scrollable\n- No overlapping text
+\n**Desktop Layout:**
+- Table format
+- Sortable columns
+\n**Empty State:**
+- If no transactions: display 'No transactions yet'\n
+### 13.5 History Page UI (Holder)
+
+**Display:**
+- Shows only own transactions
+- Clean list view
+- Same fields as admin view (excluding holder name)
+
+**Mobile Optimization:**
+- Card layout
+- Touch-friendly
+- Smooth scrolling
+
+### 13.6 Transaction Details View
+
+**Trigger:**
+- Click on any history item
+\n**Display Format:**
+- Modal/overlay\n\n**Information Displayed:**
+- Transaction ID
+- Holder name (admin view only)
+- Transaction type
+- From asset
+- To asset
+- Amount before fee
+- Fee percentage and fee amount
 - Net amount\n- Execution price
 - Status
-- Requested timestamp
-- Approved timestamp
+- Created time
+- Approved time
 
-### 13.2 History UI
-- Click entry to open detail modal
+**Mobile Requirements:**
+- Scrollable content
 - No overlapping text
-- Mobile-friendly card layout
-- Desktop table layout
+- Close button MUST work
+- Touch-friendly layout
+
+**Desktop Requirements:**
+- Centered modal
+- Clear visual hierarchy
+- Proper spacing
 
 ## 14. Responsive Design Requirements
 
@@ -305,13 +421,16 @@ LETHEX is a digital asset fund viewer and manual management system designed for 
 - Tables convert to card format
 - Full-width buttons (minimum 44px height)
 - No content overlap or hidden elements
-- Touch-friendly buttons (≥44px)
-- Asset selector scrolls smoothly
-\n### 14.2 Desktop Layout
+- Touch-friendly buttons (≥44px)\n- Asset selector scrolls smoothly
+- History and Commissions pages use card layout
+- Transaction details modal scrollable
+
+### 14.2 Desktop Layout
 - Visible sidebar navigation
 - Grid/table layouts allowed
 - Centered modals
 - Optimized spacing
+- History and Commissions pages use table layout
 \n## 15. UI/UX Design Guidelines
 
 ### 15.1 Design Style
@@ -330,14 +449,18 @@ LETHEX is a digital asset fund viewer and manual management system designed for 
 - Proper empty states with helpful messaging
 - Loading states with skeleton screens
 - Smooth Framer Motion animations
-- Clear visual hierarchy
-- No 'No tokens found' on first load
+- Clear visual hierarchy\n- No 'No tokens found' on first load
+- No 'Coming Soon' placeholders anywhere
 
 ### 15.3 Data Display
 - No fake $0.00 prices
 - Real-time price updates
-- Proper number formatting\n- Clear currency indicators (USDT/KGS)
-\n## 16. Development Standards
+- Proper number formatting
+- Clear currency indicators (USDT/KGS)
+- Empty states show meaningful messages:\n  - 'No transactions yet' (History)
+  - 'No commissions collected yet' (Commissions)
+
+## 16. Development Standards
 
 ### 16.1 Code Quality
 - Brand-new codebase from scratch
@@ -356,6 +479,9 @@ LETHEX is a digital asset fund viewer and manual management system designed for 
 - Theme switching testing
 - Holder access code change testing
 - Token loading reliability testing
+- History page functionality testing
+- Commissions page functionality testing
+- Transaction details modal testing
 
 ### 16.3 Persistence Testing
 - Language persists after refresh
@@ -369,6 +495,9 @@ LETHEX is a digital asset fund viewer and manual management system designed for 
 - Admin can safely change holder access codes
 - All settings persist after refresh
 - Clean, stable, professional UX
+- Fully functional History page (admin + holder)
+- Fully functional Commissions page (admin only)
+- Transaction details view working correctly
 
 ### 17.2 Quality Standards
 - Works on mobile & desktop
@@ -376,4 +505,7 @@ LETHEX is a digital asset fund viewer and manual management system designed for 
 - Asset selector scrolls smoothly
 - Touch-friendly buttons (≥44px)
 - No 'No tokens found' on first load
+- No 'Coming Soon' placeholders
 - Production-ready stability
+- Real transaction data displayed
+- Proper empty states with meaningful messages
