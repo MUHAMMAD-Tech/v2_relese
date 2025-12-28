@@ -55,7 +55,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       for (const token of tokens) {
         const priceInfo = priceData[token.coingecko_id];
         if (priceInfo) {
-          prices[token.symbol] = {
+          prices[token.symbol.toLowerCase()] = {
             ...priceInfo,
             symbol: token.symbol,
           };

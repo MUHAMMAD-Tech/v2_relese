@@ -342,6 +342,66 @@ export async function deleteAsset(holderId: string, tokenSymbol: string): Promis
   return true;
 }
 
+// Wrapper functions for simplified API
+export async function getAssetsByHolder(holderId: string): Promise<Asset[]> {
+  const { data, error } = await supabase
+    .from('assets')
+    .select('*')
+    .eq('holder_id', holderId)
+    .order('token_symbol', { ascending: true });
+
+  if (error) {
+    console.error('Error fetching assets:', error);
+    return [];
+  }
+  return Array.isArray(data) ? data : [];
+}
+
+export async function createAsset(assetData: AssetFormData): Promise<boolean> {
+  const { error } = await supabase
+    .from('assets')
+    .insert({
+      holder_id: assetData.holder_id,
+      token_symbol: assetData.token_symbol,
+      amount: assetData.amount,
+    });
+
+  if (error) {
+    console.error('Error creating asset:', error);
+    return false;
+  }
+  return true;
+}
+
+export async function updateAsset(assetId: string, updates: { amount: number }): Promise<boolean> {
+  const { error } = await supabase
+    .from('assets')
+    .update({
+      amount: updates.amount,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', assetId);
+
+  if (error) {
+    console.error('Error updating asset:', error);
+    return false;
+  }
+  return true;
+}
+
+export async function deleteAssetById(assetId: string): Promise<boolean> {
+  const { error } = await supabase
+    .from('assets')
+    .delete()
+    .eq('id', assetId);
+
+  if (error) {
+    console.error('Error deleting asset:', error);
+    return false;
+  }
+  return true;
+}
+
 // ============================================================================
 // TRANSACTIONS
 // ============================================================================

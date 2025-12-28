@@ -26,6 +26,9 @@ export interface TokenWhitelist {
   created_at: string;
 }
 
+// Alias for convenience
+export type Token = TokenWhitelist;
+
 export interface Holder {
   id: string;
   name: string;

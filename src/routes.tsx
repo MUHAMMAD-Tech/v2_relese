@@ -10,7 +10,10 @@ import LoginPage from './pages/LoginPage';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import AdminSettingsPage from './pages/admin/AdminSettingsPage';
 import AdminHoldersPage from './pages/admin/AdminHoldersPage';
+import AdminAssetsPage from './pages/admin/AdminAssetsPage';
 import HolderDashboardPage from './pages/holder/HolderDashboardPage';
+import HolderPortfolioPage from './pages/holder/HolderPortfolioPage';
+import HolderTransactionsPage from './pages/holder/HolderTransactionsPage';
 import NotFound from './pages/NotFound';
 
 interface RouteConfig {
@@ -55,7 +58,7 @@ const routes: RouteConfig[] = [
       {
         name: 'Admin Assets',
         path: '/admin/assets',
-        element: <div>Assets Page - Coming Soon</div>,
+        element: <AdminAssetsPage />,
       },
       {
         name: 'Admin Approvals',
@@ -87,12 +90,12 @@ const routes: RouteConfig[] = [
       {
         name: 'Holder Portfolio',
         path: '/holder/portfolio',
-        element: <div>Portfolio Page - Coming Soon</div>,
+        element: <HolderPortfolioPage />,
       },
       {
         name: 'Holder Transactions',
         path: '/holder/transactions',
-        element: <div>Transactions Page - Coming Soon</div>,
+        element: <HolderTransactionsPage />,
       },
       {
         name: 'Holder History',
