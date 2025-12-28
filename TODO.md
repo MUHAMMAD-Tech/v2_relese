@@ -165,4 +165,40 @@
   - TokenSelector component ready to use
   - Prices update every second from CoinGecko
 - ✅ **All Lint Checks Pass**: 91 files checked, no errors
-- **Progress**: Core infrastructure complete. Admin dashboard, settings, and holder management functional. Need to complete remaining admin pages and holder pages.
+
+### Session 3: Transaction Request Pipeline Fix
+- ✅ **Admin Approvals Page**:
+  - Created AdminApprovalsPage component with real-time polling (3 seconds)
+  - Displays all pending transaction requests
+  - Shows holder name, type, assets, amounts, fees, timestamps
+  - Approve/Reject buttons with confirmation dialogs
+  - Empty state when no pending requests
+  - Responsive card layout for mobile
+- ✅ **Database Policies**:
+  - Added RLS policy for holders to INSERT transactions
+  - Added RLS policy for holders to SELECT their own transactions
+  - Existing admin policy allows full transaction management
+- ✅ **Transaction Approval Logic**:
+  - Enhanced `approveTransaction()` to update holder balances
+  - Swap: Deducts from_token, adds to_token with calculated received_amount
+  - Buy: Adds to_token to holder's portfolio
+  - Sell: Deducts from_token from holder's portfolio
+  - Automatically records commission for swap transactions
+  - Creates new assets if they don't exist
+- ✅ **Data Flow**:
+  - Holder submits request → Stored in database with status='pending'
+  - Admin panel polls every 3 seconds → Displays pending requests
+  - Admin approves → Updates status, balances, and commission
+  - Admin rejects → Updates status only, no balance changes
+- ✅ **Request Ordering**:
+  - Changed `getPendingTransactions()` to order by requested_at DESC (newest first)
+- ✅ **Route Integration**:
+  - Registered AdminApprovalsPage in routes.tsx
+  - Replaced placeholder with actual component
+- ✅ **Verification Documentation**:
+  - Created TRANSACTION_FLOW_VERIFICATION.md with complete testing guide
+  - Documented entire request pipeline
+  - Included verification checklist
+- ✅ **All Lint Checks Pass**: 92 files checked, no errors
+
+**Progress**: Transaction request pipeline fully functional. All holder requests (swap/buy/sell) are now reliably sent, stored, and visible to admin in real-time with automatic balance updates on approval.

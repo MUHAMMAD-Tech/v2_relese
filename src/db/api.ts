@@ -471,7 +471,7 @@ export async function getPendingTransactions(): Promise<TransactionWithDetails[]
       to_token_data:token_whitelist!transactions_to_token_fkey(*)
     `)
     .eq('status', 'pending')
-    .order('requested_at', { ascending: true });
+    .order('requested_at', { ascending: false });
 
   if (error) {
     console.error('Error fetching pending transactions:', error);
@@ -520,11 +520,30 @@ export async function approveTransaction(
   approvedBy: string,
   executionPrice?: string
 ): Promise<boolean> {
+  // First, get the transaction details
+  const { data: transaction, error: fetchError } = await supabase
+    .from('transactions')
+    .select('*')
+    .eq('id', transactionId)
+    .single();
+
+  if (fetchError || !transaction) {
+    console.error('Error fetching transaction:', fetchError);
+    return false;
+  }
+
+  // Calculate received amount for swap transactions
+  let receivedAmount = transaction.received_amount;
+  if (transaction.transaction_type === 'swap' && executionPrice) {
+    receivedAmount = (parseFloat(transaction.net_amount) * parseFloat(executionPrice)).toString();
+  }
+
   const updateData: {
     status: TransactionStatus;
     approved_at: string;
     approved_by: string;
     execution_price?: string;
+    received_amount?: string;
     updated_at: string;
   } = {
     status: 'approved',
@@ -537,16 +556,128 @@ export async function approveTransaction(
     updateData.execution_price = executionPrice;
   }
 
-  const { error } = await supabase
+  if (receivedAmount) {
+    updateData.received_amount = receivedAmount;
+  }
+
+  // Update transaction status
+  const { error: updateError } = await supabase
     .from('transactions')
     .update(updateData)
     .eq('id', transactionId);
 
-  if (error) {
-    console.error('Error approving transaction:', error);
+  if (updateError) {
+    console.error('Error approving transaction:', updateError);
     return false;
   }
-  return true;
+
+  // Update holder balances based on transaction type
+  try {
+    if (transaction.transaction_type === 'swap') {
+      // Deduct from_token amount
+      const { data: fromAsset } = await supabase
+        .from('assets')
+        .select('amount')
+        .eq('holder_id', transaction.holder_id)
+        .eq('token_symbol', transaction.from_token)
+        .single();
+
+      if (fromAsset) {
+        const newFromAmount = parseFloat(fromAsset.amount) - parseFloat(transaction.amount);
+        await supabase
+          .from('assets')
+          .update({ amount: newFromAmount.toString() })
+          .eq('holder_id', transaction.holder_id)
+          .eq('token_symbol', transaction.from_token);
+      }
+
+      // Add to_token amount (or create if doesn't exist)
+      const { data: toAsset } = await supabase
+        .from('assets')
+        .select('amount')
+        .eq('holder_id', transaction.holder_id)
+        .eq('token_symbol', transaction.to_token)
+        .maybeSingle();
+
+      if (toAsset) {
+        const newToAmount = parseFloat(toAsset.amount) + parseFloat(receivedAmount || '0');
+        await supabase
+          .from('assets')
+          .update({ amount: newToAmount.toString() })
+          .eq('holder_id', transaction.holder_id)
+          .eq('token_symbol', transaction.to_token);
+      } else {
+        // Create new asset
+        await supabase
+          .from('assets')
+          .insert({
+            holder_id: transaction.holder_id,
+            token_symbol: transaction.to_token,
+            amount: receivedAmount || '0',
+          });
+      }
+    } else if (transaction.transaction_type === 'buy') {
+      // Add to_token amount (or create if doesn't exist)
+      const { data: toAsset } = await supabase
+        .from('assets')
+        .select('amount')
+        .eq('holder_id', transaction.holder_id)
+        .eq('token_symbol', transaction.to_token)
+        .maybeSingle();
+
+      if (toAsset) {
+        const newAmount = parseFloat(toAsset.amount) + parseFloat(transaction.amount);
+        await supabase
+          .from('assets')
+          .update({ amount: newAmount.toString() })
+          .eq('holder_id', transaction.holder_id)
+          .eq('token_symbol', transaction.to_token);
+      } else {
+        // Create new asset
+        await supabase
+          .from('assets')
+          .insert({
+            holder_id: transaction.holder_id,
+            token_symbol: transaction.to_token,
+            amount: transaction.amount,
+          });
+      }
+    } else if (transaction.transaction_type === 'sell') {
+      // Deduct from_token amount
+      const { data: fromAsset } = await supabase
+        .from('assets')
+        .select('amount')
+        .eq('holder_id', transaction.holder_id)
+        .eq('token_symbol', transaction.from_token)
+        .single();
+
+      if (fromAsset) {
+        const newAmount = parseFloat(fromAsset.amount) - parseFloat(transaction.amount);
+        await supabase
+          .from('assets')
+          .update({ amount: newAmount.toString() })
+          .eq('holder_id', transaction.holder_id)
+          .eq('token_symbol', transaction.from_token);
+      }
+    }
+
+    // Record commission for swap transactions
+    if (transaction.transaction_type === 'swap' && parseFloat(transaction.fee) > 0) {
+      await supabase
+        .from('commissions')
+        .insert({
+          transaction_id: transactionId,
+          holder_id: transaction.holder_id,
+          fee_amount: transaction.fee,
+          fee_token: transaction.from_token,
+        });
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error updating balances:', error);
+    return false;
+  }
 }
 
 export async function rejectTransaction(transactionId: string, approvedBy: string): Promise<boolean> {

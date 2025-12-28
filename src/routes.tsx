@@ -11,6 +11,7 @@ import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import AdminSettingsPage from './pages/admin/AdminSettingsPage';
 import AdminHoldersPage from './pages/admin/AdminHoldersPage';
 import AdminAssetsPage from './pages/admin/AdminAssetsPage';
+import AdminApprovalsPage from './pages/admin/AdminApprovalsPage';
 import HolderDashboardPage from './pages/holder/HolderDashboardPage';
 import HolderPortfolioPage from './pages/holder/HolderPortfolioPage';
 import HolderTransactionsPage from './pages/holder/HolderTransactionsPage';
@@ -63,7 +64,7 @@ const routes: RouteConfig[] = [
       {
         name: 'Admin Approvals',
         path: '/admin/approvals',
-        element: <div>Approvals Page - Coming Soon</div>,
+        element: <AdminApprovalsPage />,
       },
       {
         name: 'Admin History',
