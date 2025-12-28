@@ -92,18 +92,18 @@ export default function AdminApprovalsPage() {
   const handleReject = async (transaction: TransactionWithDetails) => {
     setProcessing(true);
 
-    const success = await rejectTransaction(
+    const result = await rejectTransaction(
       transaction.id,
       'admin' // In a real system, this would be the actual admin user ID
     );
 
     setProcessing(false);
 
-    if (success) {
+    if (result.success) {
       toast.success('Transaction rejected');
       loadTransactions();
     } else {
-      toast.error('Failed to reject transaction');
+      toast.error(result.error || 'Failed to reject transaction');
     }
   };
 

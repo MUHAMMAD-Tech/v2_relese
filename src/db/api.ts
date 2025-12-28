@@ -558,7 +558,19 @@ export async function approveTransaction(
       return { success: false, error: 'Holder not found' };
     }
 
-    // Step 4: Validate execution price for swap
+    // Step 4: Get admin profile ID for approved_by field
+    const { data: adminProfile, error: adminError } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('role', 'admin')
+      .maybeSingle();
+
+    if (adminError || !adminProfile) {
+      console.error('[approveTransaction] Admin profile not found');
+      return { success: false, error: 'Admin profile not found' };
+    }
+
+    // Step 5: Validate execution price for swap
     if (transaction.transaction_type === 'swap') {
       if (!executionPrice || parseFloat(executionPrice) <= 0) {
         console.error('[approveTransaction] Invalid execution price for swap');
@@ -566,14 +578,14 @@ export async function approveTransaction(
       }
     }
 
-    // Step 5: Calculate received amount for swap
+    // Step 6: Calculate received amount for swap
     let receivedAmount = transaction.received_amount;
     if (transaction.transaction_type === 'swap' && executionPrice) {
       receivedAmount = (parseFloat(transaction.net_amount) * parseFloat(executionPrice)).toFixed(8);
       console.log('[approveTransaction] Calculated received amount:', receivedAmount);
     }
 
-    // Step 6: Validate balances for swap and sell
+    // Step 7: Validate balances for swap and sell
     if (transaction.transaction_type === 'swap' || transaction.transaction_type === 'sell') {
       const { data: fromAsset, error: assetError } = await supabase
         .from('assets')
@@ -604,7 +616,7 @@ export async function approveTransaction(
       }
     }
 
-    // Step 7: Validate tokens exist in whitelist
+    // Step 8: Validate tokens exist in whitelist
     if (transaction.from_token) {
       const { data: fromToken } = await supabase
         .from('token_whitelist')
@@ -633,7 +645,7 @@ export async function approveTransaction(
 
     console.log('[approveTransaction] All validations passed, updating balances...');
 
-    // Step 8: Update balances based on transaction type
+    // Step 9: Update balances based on transaction type
     if (transaction.transaction_type === 'swap') {
       // Deduct from_token
       const { data: fromAsset } = await supabase
@@ -657,7 +669,7 @@ export async function approveTransaction(
 
         if (updateFromError) {
           console.error('[approveTransaction] Error updating from_token balance:', updateFromError);
-          return { success: false, error: 'Failed to update from_token balance' };
+          return { success: false, error: 'Failed to update from_token balance: ' + updateFromError.message };
         }
       }
 
@@ -683,7 +695,7 @@ export async function approveTransaction(
 
         if (updateToError) {
           console.error('[approveTransaction] Error updating to_token balance:', updateToError);
-          return { success: false, error: 'Failed to update to_token balance' };
+          return { success: false, error: 'Failed to update to_token balance: ' + updateToError.message };
         }
       } else {
         console.log('[approveTransaction] Creating new to_token asset:', transaction.to_token);
@@ -724,7 +736,7 @@ export async function approveTransaction(
 
         if (updateError) {
           console.error('[approveTransaction] Error updating buy token balance:', updateError);
-          return { success: false, error: 'Failed to update token balance' };
+          return { success: false, error: 'Failed to update token balance: ' + updateError.message };
         }
       } else {
         console.log('[approveTransaction] Creating new buy token asset:', transaction.to_token);
@@ -765,12 +777,12 @@ export async function approveTransaction(
 
         if (updateError) {
           console.error('[approveTransaction] Error updating sell token balance:', updateError);
-          return { success: false, error: 'Failed to update token balance' };
+          return { success: false, error: 'Failed to update token balance: ' + updateError.message };
         }
       }
     }
 
-    // Step 9: Update transaction status
+    // Step 10: Update transaction status
     console.log('[approveTransaction] Updating transaction status to approved...');
     
     const updateData: {
@@ -783,7 +795,7 @@ export async function approveTransaction(
     } = {
       status: 'approved',
       approved_at: new Date().toISOString(),
-      approved_by: approvedBy,
+      approved_by: adminProfile.id, // Use actual admin profile ID
       updated_at: new Date().toISOString(),
     };
 
@@ -798,14 +810,15 @@ export async function approveTransaction(
     const { error: updateTransactionError } = await supabase
       .from('transactions')
       .update(updateData)
-      .eq('id', transactionId);
+      .eq('id', transactionId)
+      .eq('status', 'pending'); // Only update if still pending
 
     if (updateTransactionError) {
       console.error('[approveTransaction] Error updating transaction status:', updateTransactionError);
-      return { success: false, error: 'Failed to update transaction status' };
+      return { success: false, error: 'Failed to update transaction status: ' + updateTransactionError.message };
     }
 
-    // Step 10: Record commission for swap transactions
+    // Step 11: Record commission for swap transactions
     if (transaction.transaction_type === 'swap' && parseFloat(transaction.fee) > 0) {
       console.log('[approveTransaction] Recording commission...');
       
@@ -836,22 +849,71 @@ export async function approveTransaction(
   }
 }
 
-export async function rejectTransaction(transactionId: string, approvedBy: string): Promise<boolean> {
-  const { error } = await supabase
-    .from('transactions')
-    .update({
-      status: 'rejected',
-      approved_at: new Date().toISOString(),
-      approved_by: approvedBy,
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', transactionId);
+export async function rejectTransaction(transactionId: string, approvedBy: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    console.log('[rejectTransaction] Starting rejection for transaction:', transactionId);
 
-  if (error) {
-    console.error('Error rejecting transaction:', error);
-    return false;
+    // Fetch transaction to validate it exists and is pending
+    const { data: transaction, error: fetchError } = await supabase
+      .from('transactions')
+      .select('id, status')
+      .eq('id', transactionId)
+      .maybeSingle();
+
+    if (fetchError) {
+      console.error('[rejectTransaction] Database error fetching transaction:', fetchError);
+      return { success: false, error: 'Database error: ' + fetchError.message };
+    }
+
+    if (!transaction) {
+      console.error('[rejectTransaction] Transaction not found:', transactionId);
+      return { success: false, error: 'Transaction not found' };
+    }
+
+    if (transaction.status !== 'pending') {
+      console.error('[rejectTransaction] Transaction already processed:', transaction.status);
+      return { success: false, error: `Transaction already ${transaction.status}` };
+    }
+
+    // Get admin profile ID
+    const { data: adminProfile, error: adminError } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('role', 'admin')
+      .maybeSingle();
+
+    if (adminError || !adminProfile) {
+      console.error('[rejectTransaction] Admin profile not found');
+      return { success: false, error: 'Admin profile not found' };
+    }
+
+    // Update transaction status
+    const { error: updateError } = await supabase
+      .from('transactions')
+      .update({
+        status: 'rejected',
+        approved_at: new Date().toISOString(),
+        approved_by: adminProfile.id,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', transactionId)
+      .eq('status', 'pending'); // Only update if still pending
+
+    if (updateError) {
+      console.error('[rejectTransaction] Error updating transaction status:', updateError);
+      return { success: false, error: 'Failed to update transaction status: ' + updateError.message };
+    }
+
+    console.log('[rejectTransaction] Transaction rejected successfully');
+    return { success: true };
+
+  } catch (error) {
+    console.error('[rejectTransaction] Unexpected error:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error occurred'
+    };
   }
-  return true;
 }
 
 export async function updateTransactionExecutionPrice(
