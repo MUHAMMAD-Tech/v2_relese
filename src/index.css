@@ -3,8 +3,9 @@
 @tailwind components;
 @tailwind utilities;
 
-/* LETHEX Premium Dark Fintech Design System
-   Deep charcoal backgrounds with electric blue and amber accents
+/* LETHEX Premium Dark Design System
+   Pure black backgrounds with pink-to-cyan gradient accents
+   Logo-inspired color palette: #FF00FF (magenta) → #00D4FF (cyan)
    All colors MUST be HSL.
 */
 
@@ -12,82 +13,82 @@
   :root {
     --radius: 0.5rem;
     /* Light mode - Clean professional theme */
-    --background: 0 0% 98%; /* Light gray background */
-    --foreground: 222.2 84% 4.9%; /* Dark text */
-    --card: 0 0% 100%; /* White cards */
-    --card-foreground: 222.2 84% 4.9%;
+    --background: 0 0% 98%;
+    --foreground: 0 0% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 10%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 194 100% 50%; /* Electric blue #00d4ff */
+    --popover-foreground: 0 0% 10%;
+    --primary: 300 100% 50%; /* Magenta #FF00FF */
     --primary-foreground: 0 0% 100%;
-    --secondary: 210 40% 96.1%; /* Light gray */
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 0 0% 10%;
     --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 94%; /* Subtle highlight */
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --muted-foreground: 0 0% 45%;
+    --accent: 194 100% 50%; /* Cyan #00D4FF */
+    --accent-foreground: 0 0% 0%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 194 100% 50%;
-    --warning: 38 92% 50%; /* Amber #fbbf24 */
+    --ring: 300 100% 50%;
+    --warning: 38 92% 50%;
     --warning-foreground: 0 0% 0%;
     --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
-    --chart-1: 194 100% 50%;
-    --chart-2: 142 76% 36%;
-    --chart-3: 38 92% 50%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    --chart-1: 300 100% 50%;
+    --chart-2: 270 100% 60%;
+    --chart-3: 240 100% 60%;
+    --chart-4: 210 100% 60%;
+    --chart-5: 194 100% 50%;
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 222.2 84% 4.9%;
-    --sidebar-primary: 194 100% 50%;
+    --sidebar-foreground: 0 0% 10%;
+    --sidebar-primary: 300 100% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 210 40% 96.1%;
-    --sidebar-accent-foreground: 222.2 47.4% 11.2%;
+    --sidebar-accent-foreground: 0 0% 10%;
     --sidebar-border: 214.3 31.8% 91.4%;
-    --sidebar-ring: 194 100% 50%;
+    --sidebar-ring: 300 100% 50%;
   }
 
   .dark {
-    /* Premium dark fintech theme */
-    --background: 210 25% 6%; /* Deep charcoal #0f1419 */
-    --foreground: 0 0% 98%; /* Near white */
-    --card: 210 20% 10%; /* Slightly lighter charcoal #1a1f26 */
-    --card-foreground: 0 0% 98%;
-    --popover: 210 20% 10%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 194 100% 50%; /* Electric blue #00d4ff */
-    --primary-foreground: 0 0% 0%;
-    --secondary: 210 15% 15%; /* Muted charcoal */
-    --secondary-foreground: 0 0% 98%;
-    --muted: 210 15% 15%;
-    --muted-foreground: 0 0% 65%;
-    --accent: 210 15% 18%; /* Subtle highlight */
-    --accent-foreground: 0 0% 98%;
+    /* LETHEX Dark Theme - Pure black with gradient accents */
+    --background: 0 0% 0%; /* Pure black #000000 */
+    --foreground: 0 0% 95%; /* Near white */
+    --card: 0 0% 5%; /* Very dark gray #0d0d0d */
+    --card-foreground: 0 0% 95%;
+    --popover: 0 0% 5%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 300 100% 50%; /* Magenta #FF00FF */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 10%; /* Dark gray */
+    --secondary-foreground: 0 0% 95%;
+    --muted: 0 0% 10%;
+    --muted-foreground: 0 0% 60%;
+    --accent: 194 100% 50%; /* Cyan #00D4FF */
+    --accent-foreground: 0 0% 0%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-    --border: 210 15% 18%;
-    --input: 210 15% 18%;
-    --ring: 194 100% 50%;
-    --warning: 38 92% 50%; /* Amber #fbbf24 */
+    --border: 0 0% 15%;
+    --input: 0 0% 15%;
+    --ring: 300 100% 50%;
+    --warning: 38 92% 50%;
     --warning-foreground: 0 0% 0%;
     --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
-    --chart-1: 194 100% 50%;
-    --chart-2: 142 76% 36%;
-    --chart-3: 38 92% 50%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-    --sidebar-background: 210 25% 6%;
-    --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 194 100% 50%;
-    --sidebar-primary-foreground: 0 0% 0%;
-    --sidebar-accent: 210 15% 15%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 210 15% 18%;
-    --sidebar-ring: 194 100% 50%;
+    --chart-1: 300 100% 50%;
+    --chart-2: 270 100% 60%;
+    --chart-3: 240 100% 60%;
+    --chart-4: 210 100% 60%;
+    --chart-5: 194 100% 50%;
+    --sidebar-background: 0 0% 0%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 300 100% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 10%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 0 0% 15%;
+    --sidebar-ring: 300 100% 50%;
   }
 }
 
@@ -104,19 +105,23 @@
 
 @layer utilities {
   .gradient-text {
-    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--warning)));
+    background: linear-gradient(135deg, #FF00FF, #00D4FF);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
   }
 
+  .gradient-bg {
+    background: linear-gradient(135deg, #FF00FF, #00D4FF);
+  }
+
   .card-glow {
-    box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
+    box-shadow: 0 0 20px rgba(255, 0, 255, 0.15);
   }
 
   .card-glow-hover:hover {
-    box-shadow: 0 0 30px rgba(0, 212, 255, 0.2);
+    box-shadow: 0 0 30px rgba(255, 0, 255, 0.25);
     transition: box-shadow 0.3s ease;
   }
 }
