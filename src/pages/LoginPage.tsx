@@ -9,7 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useAppStore } from '@/store/appStore';
 import { verifyAdminAccessCode, getHolderByAccessCode } from '@/db/api';
 import { toast } from 'sonner';
-import { Lock, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 export default function LoginPage() {
   const [accessCode, setAccessCode] = useState('');
@@ -105,8 +105,12 @@ export default function LoginPage() {
       >
         <Card className="border-border bg-card card-glow">
           <CardHeader className="space-y-4 text-center">
-            <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-              <Lock className="w-8 h-8 text-primary" />
+            <div className="mx-auto w-24 h-24 flex items-center justify-center">
+              <img 
+                src="/lethex-logo.png" 
+                alt="LETHEX Logo" 
+                className="w-full h-full object-contain"
+              />
             </div>
             <CardTitle className="text-3xl font-bold gradient-text">
               LETHEX
