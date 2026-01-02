@@ -15,81 +15,112 @@ export default function LoginPage() {
   const [accessCode, setAccessCode] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { signIn, signUp } = useAuth();
+  const { signIn, signUp, updateRole } = useAuth();
   const { setCurrentHolder } = useAppStore();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!accessCode.trim()) {
-      toast.error('Iltimos, kirish kodini kiriting');
+      toast.error('Please enter access code');
       return;
     }
 
     setLoading(true);
 
     try {
-      console.log('Kirish kodi tekshirilmoqda:', accessCode);
+      console.log('Checking access code:', accessCode);
       
       // Step 1: Check if it's the admin access code
       const isAdmin = await verifyAdminAccessCode(accessCode);
-      console.log('Admin tekshiruvi natijasi:', isAdmin);
+      console.log('Admin check result:', isAdmin);
 
       if (isAdmin) {
-        console.log('Admin sifatida kirish...');
+        console.log('Logging in as admin...');
         // Admin login - use Supabase Auth
-        // For admin, we'll use a fixed username "admin" with the access code as password
         let authSuccess = false;
         
         // Try to sign in first
         const { error: signInError } = await signIn('admin', accessCode);
 
         if (signInError) {
-          console.log('SignIn xatosi, SignUp urinilmoqda:', signInError.message);
+          console.log('SignIn error, trying SignUp:', signInError.message);
           // If sign in fails, try to sign up (first time admin)
           const { error: signUpError } = await signUp('admin', accessCode);
           
           if (!signUpError) {
-            console.log('SignUp muvaffaqiyatli');
+            console.log('SignUp successful');
             authSuccess = true;
           } else {
-            console.error('SignUp xatosi:', signUpError.message);
+            console.error('SignUp error:', signUpError.message);
           }
         } else {
-          console.log('SignIn muvaffaqiyatli');
+          console.log('SignIn successful');
           authSuccess = true;
         }
 
         if (authSuccess) {
-          toast.success('Xush kelibsiz, Admin!');
+          // Update role to admin
+          await updateRole('admin');
+          toast.success('Welcome, Admin!');
           navigate('/admin/dashboard');
           return;
         } else {
-          toast.error('Admin autentifikatsiyasi muvaffaqiyatsiz');
+          toast.error('Admin authentication failed');
           setLoading(false);
           return;
         }
       }
 
-      console.log('Holder sifatida tekshirilmoqda...');
+      console.log('Checking as holder...');
       // Step 2: Check if it's a holder access code
       const holder = await getHolderByAccessCode(accessCode);
-      console.log('Holder topildi:', holder);
+      console.log('Holder found:', holder);
 
       if (holder) {
-        // Holder login - store in session
-        setCurrentHolder(holder);
-        toast.success(`Xush kelibsiz, ${holder.name}!`);
-        navigate('/holder/dashboard');
-        return;
+        // Holder login - authenticate with Supabase Auth
+        // Use holder ID as username and access code as password
+        let authSuccess = false;
+        
+        // Try to sign in first
+        const { error: signInError } = await signIn(holder.id, accessCode);
+
+        if (signInError) {
+          console.log('Holder SignIn error, trying SignUp:', signInError.message);
+          // If sign in fails, try to sign up (first time holder)
+          const { error: signUpError } = await signUp(holder.id, accessCode);
+          
+          if (!signUpError) {
+            console.log('Holder SignUp successful');
+            authSuccess = true;
+          } else {
+            console.error('Holder SignUp error:', signUpError.message);
+          }
+        } else {
+          console.log('Holder SignIn successful');
+          authSuccess = true;
+        }
+
+        if (authSuccess) {
+          // Update role to holder and store holder info
+          await updateRole('holder');
+          setCurrentHolder(holder);
+          toast.success(`Welcome, ${holder.name}!`);
+          navigate('/holder/dashboard');
+          return;
+        } else {
+          toast.error('Holder authentication failed');
+          setLoading(false);
+          return;
+        }
       }
 
       // Step 3: Invalid access code
-      console.log('Kirish kodi topilmadi');
-      toast.error('Noto\'g\'ri kirish kodi');
+      console.log('Access code not found');
+      toast.error('Invalid access code');
     } catch (error) {
-      console.error('Login xatosi:', error);
-      toast.error('Kirish paytida xatolik yuz berdi');
+      console.error('Login error:', error);
+      toast.error('An error occurred during login');
     } finally {
       setLoading(false);
     }

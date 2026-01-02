@@ -17,6 +17,18 @@ export async function getProfile(userId: string): Promise<Profile | null> {
   return data;
 }
 
+export async function updateProfileRole(userId: string, role: 'admin' | 'holder'): Promise<void> {
+  const { error } = await supabase
+    .from('profiles')
+    .update({ role, updated_at: new Date().toISOString() })
+    .eq('id', userId);
+
+  if (error) {
+    console.error('Error updating profile role:', error);
+    throw error;
+  }
+}
+
 interface AuthContextType {
   user: User | null;
   profile: Profile | null;
@@ -25,6 +37,7 @@ interface AuthContextType {
   signUp: (username: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
+  updateRole: (role: 'admin' | 'holder') => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -102,8 +115,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setProfile(null);
   };
 
+  const updateRole = async (role: 'admin' | 'holder') => {
+    if (!user) {
+      throw new Error('No user logged in');
+    }
+    await updateProfileRole(user.id, role);
+    await refreshProfile();
+  };
+
   return (
-    <AuthContext.Provider value={{ user, profile, loading, signIn, signUp, signOut, refreshProfile }}>
+    <AuthContext.Provider value={{ user, profile, loading, signIn, signUp, signOut, refreshProfile, updateRole }}>
       {children}
     </AuthContext.Provider>
   );
