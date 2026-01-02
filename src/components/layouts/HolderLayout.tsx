@@ -5,8 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useAppStore } from '@/store/appStore';
 import { useI18n } from '@/contexts/I18nContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { Header } from '@/components/common/Header';
 import { toast } from 'sonner';
+import { getHolderById } from '@/db/api';
 import {
   Wallet,
   ArrowRightLeft,
@@ -15,14 +17,55 @@ import {
   LogOut,
   LayoutDashboard,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export function HolderLayout() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { currentHolder, clearCurrentHolder } = useAppStore();
+  const { currentHolder, clearCurrentHolder, setCurrentHolder } = useAppStore();
+  const { user, profile } = useAuth();
   const { t } = useI18n();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  // Load holder data from auth session
+  useEffect(() => {
+    const loadHolderData = async () => {
+      if (!user || !profile) {
+        setLoading(false);
+        return;
+      }
+
+      // If holder data is already loaded, skip
+      if (currentHolder) {
+        setLoading(false);
+        return;
+      }
+
+      // Extract holder ID from email (format: {holder_id}@miaoda.com)
+      const email = user.email || '';
+      const holderId = email.replace('@miaoda.com', '');
+
+      if (holderId && holderId !== 'admin') {
+        try {
+          const holder = await getHolderById(holderId);
+          if (holder) {
+            setCurrentHolder(holder);
+          } else {
+            console.error('Holder topilmadi:', holderId);
+            toast.error('Holder ma\'lumotlari topilmadi');
+          }
+        } catch (error) {
+          console.error('Holder yuklashda xatolik:', error);
+          toast.error('Holder ma\'lumotlarini yuklashda xatolik');
+        }
+      }
+
+      setLoading(false);
+    };
+
+    loadHolderData();
+  }, [user, profile, currentHolder, setCurrentHolder]);
 
   const navigation = [
     { name: t('admin.dashboard'), href: '/holder/dashboard', icon: LayoutDashboard },
@@ -59,6 +102,15 @@ export function HolderLayout() {
       })}
     </>
   );
+
+  // Show loading state while holder data is being loaded
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen w-full bg-background">
