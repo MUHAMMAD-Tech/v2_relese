@@ -18,16 +18,29 @@ export default function HolderPortfolioPage() {
   }, [currentHolder]);
 
   const loadData = async () => {
-    if (!currentHolder) return;
+    if (!currentHolder) {
+      console.log('❌ currentHolder yo\'q');
+      return;
+    }
+    
+    console.log('🔄 Portfolio ma\'lumotlari yuklanmoqda...');
+    console.log('📋 Holder ID:', currentHolder.id);
+    console.log('👤 Holder nomi:', currentHolder.name);
     
     setLoading(true);
     const [assetsData, tokensData] = await Promise.all([
       getAssetsByHolder(currentHolder.id),
       getAllTokens(),
     ]);
+    
+    console.log('📊 Assets data:', assetsData);
+    console.log('🪙 Tokens data:', tokensData.length, 'tokens');
+    
     setAssets(assetsData);
     setTokens(tokensData);
     setLoading(false);
+    
+    console.log(`✅ Portfolio yuklandi: ${assetsData.length} ta asset`);
   };
 
   const getTokenPrice = (symbol: string): number => {

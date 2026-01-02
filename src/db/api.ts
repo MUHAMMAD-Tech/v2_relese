@@ -278,6 +278,8 @@ export { generateAccessCode };
 // ============================================================================
 
 export async function getAssetsByHolderId(holderId: string): Promise<AssetWithToken[]> {
+  console.log('🔍 getAssetsByHolderId called with:', holderId);
+  
   const { data, error } = await supabase
     .from('assets')
     .select(`
@@ -288,9 +290,21 @@ export async function getAssetsByHolderId(holderId: string): Promise<AssetWithTo
     .order('token_symbol', { ascending: true });
 
   if (error) {
-    console.error('Error fetching assets:', error);
+    console.error('❌ Error fetching assets:', error);
+    console.error('Error details:', {
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+      code: error.code
+    });
     return [];
   }
+  
+  console.log(`✅ Assets fetched successfully: ${data?.length || 0} assets`);
+  if (data && data.length > 0) {
+    console.log('Assets data:', data);
+  }
+  
   return Array.isArray(data) ? data : [];
 }
 
@@ -362,6 +376,8 @@ export async function deleteAsset(holderId: string, tokenSymbol: string): Promis
 
 // Wrapper functions for simplified API
 export async function getAssetsByHolder(holderId: string): Promise<Asset[]> {
+  console.log('🔍 getAssetsByHolder called with:', holderId);
+  
   const { data, error } = await supabase
     .from('assets')
     .select('*')
@@ -369,9 +385,21 @@ export async function getAssetsByHolder(holderId: string): Promise<Asset[]> {
     .order('token_symbol', { ascending: true });
 
   if (error) {
-    console.error('Error fetching assets:', error);
+    console.error('❌ Error fetching assets:', error);
+    console.error('Error details:', {
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+      code: error.code
+    });
     return [];
   }
+  
+  console.log(`✅ Assets fetched successfully: ${data?.length || 0} assets`);
+  if (data && data.length > 0) {
+    console.log('Assets data:', data);
+  }
+  
   return Array.isArray(data) ? data : [];
 }
 
