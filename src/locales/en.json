@@ -17,7 +17,8 @@
     "enterAccessCode": "Enter Access Code",
     "accessCode": "Access Code",
     "invalidCode": "Invalid access code",
-    "loginSuccess": "Login successful"
+    "loginSuccess": "Login successful",
+    "logoutSuccess": "Logged out successfully"
   },
   "admin": {
     "dashboard": "Dashboard",

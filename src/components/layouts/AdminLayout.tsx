@@ -4,6 +4,7 @@ import { motion } from 'motion/react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAppStore } from '@/store/appStore';
 import { useI18n } from '@/contexts/I18nContext';
 import { Header } from '@/components/common/Header';
 import { toast } from 'sonner';
@@ -25,6 +26,7 @@ export function AdminLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const { signOut, profile } = useAuth();
+  const { clearCurrentHolder } = useAppStore();
   const { t } = useI18n();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -40,9 +42,15 @@ export function AdminLayout() {
   ];
 
   const handleLogout = async () => {
-    await signOut();
-    toast.success(t('auth.loginSuccess'));
-    navigate('/login');
+    try {
+      await signOut();
+      clearCurrentHolder();
+      toast.success(t('auth.logoutSuccess'));
+      navigate('/login');
+    } catch (error) {
+      console.error('Chiqishda xatolik:', error);
+      toast.error('Chiqishda xatolik yuz berdi');
+    }
   };
 
   const NavLinks = () => (

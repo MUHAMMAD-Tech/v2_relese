@@ -23,7 +23,7 @@ export function HolderLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const { currentHolder, clearCurrentHolder, setCurrentHolder } = useAppStore();
-  const { user, profile } = useAuth();
+  const { user, profile, signOut } = useAuth();
   const { t } = useI18n();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -74,10 +74,16 @@ export function HolderLayout() {
     { name: t('admin.history'), href: '/holder/history', icon: History },
   ];
 
-  const handleExit = () => {
-    clearCurrentHolder();
-    toast.success(t('auth.loginSuccess'));
-    navigate('/login');
+  const handleExit = async () => {
+    try {
+      await signOut();
+      clearCurrentHolder();
+      toast.success(t('auth.logoutSuccess'));
+      navigate('/login');
+    } catch (error) {
+      console.error('Chiqishda xatolik:', error);
+      toast.error('Chiqishda xatolik yuz berdi');
+    }
   };
 
   const NavLinks = () => (

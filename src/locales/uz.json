@@ -17,7 +17,8 @@
     "enterAccessCode": "Kirish kodini kiriting",
     "accessCode": "Kirish kodi",
     "invalidCode": "Noto'g'ri kirish kodi",
-    "loginSuccess": "Muvaffaqiyatli kirildi"
+    "loginSuccess": "Muvaffaqiyatli kirildi",
+    "logoutSuccess": "Tizimdan muvaffaqiyatli chiqildi"
   },
   "admin": {
     "dashboard": "Boshqaruv paneli",

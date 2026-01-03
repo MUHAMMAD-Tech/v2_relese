@@ -1,4 +1,31 @@
-# Task: Build LETHEX Digital Asset Fund Management System
+# Task: Fix Login Speed and Exit Button Issues
+
+## Current Issues
+- Issue 1: Slow navigation from login page to dashboard after entering access code
+- Issue 2: Exit button not working properly - users remain logged in after clicking exit
+
+## Plan
+- [x] Fix exit button in both layouts
+  - [x] Update HolderLayout to call signOut() from AuthContext
+  - [x] Update AdminLayout to also clear holder data
+- [x] Optimize login flow for faster navigation
+  - [x] Streamline authentication process in LoginPage
+  - [x] Remove unnecessary console.log statements
+  - [x] Simplify auth flow logic
+  - [x] Use replace: true for navigation to prevent back button issues
+- [x] Add logout translation keys to all languages
+- [x] Test and validate fixes
+
+## Changes Made
+1. **HolderLayout.tsx**: Updated `handleExit` to call `signOut()` before clearing holder data
+2. **AdminLayout.tsx**: Updated `handleLogout` to call `clearCurrentHolder()` and added proper error handling
+3. **LoginPage.tsx**: Removed all console.log statements, simplified auth flow, added `replace: true` to navigation
+4. **Locale files**: Added `logoutSuccess` translation key to uz.json, en.json, and ru.json
+5. Both layouts now properly sign out from Supabase Auth, preventing automatic re-login
+
+---
+
+# Previous Task: Build LETHEX Digital Asset Fund Management System
 
 ## Plan
 - [x] Step 1: Design System Setup

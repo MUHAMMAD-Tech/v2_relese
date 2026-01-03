@@ -17,7 +17,8 @@
     "enterAccessCode": "Введите код доступа",
     "accessCode": "Код доступа",
     "invalidCode": "Неверный код доступа",
-    "loginSuccess": "Успешный вход"
+    "loginSuccess": "Успешный вход",
+    "logoutSuccess": "Успешный выход"
   },
   "admin": {
     "dashboard": "Панель управления",
