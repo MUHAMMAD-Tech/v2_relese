@@ -1,4 +1,61 @@
-# Task: Fix Token Selector - Add Missing Token Data
+# Task: Environment Variables Documentation
+
+## Completed
+- [x] Update .env file with comprehensive comments
+- [x] Create .env.example for documentation
+- [x] Create ENV_AND_PRICE_GUIDE.md with detailed explanations
+- [x] Document CoinGecko API usage
+- [x] Document Supabase configuration
+- [x] Document price fetching mechanism
+- [x] Run lint check
+
+## Changes Made
+1. **.env**: 
+   - Added comprehensive Uzbek comments
+   - Documented all environment variables
+   - Added CoinGecko API explanation
+   - Added setup instructions
+   - Explained price fetching mechanism
+
+2. **.env.example**: 
+   - Created template file for new developers
+   - Includes all required variables with placeholders
+   - Setup instructions included
+
+3. **ENV_AND_PRICE_GUIDE.md**:
+   - Complete documentation in Uzbek
+   - Environment variables explanation
+   - CoinGecko API integration details
+   - Price service architecture
+   - Token whitelist information
+   - Cache system explanation
+   - Security guidelines
+   - Troubleshooting section
+
+## Key Information
+
+### Environment Variables
+- `VITE_APP_ID`: Application identifier
+- `VITE_SUPABASE_URL`: Supabase project URL
+- `VITE_SUPABASE_ANON_KEY`: Public key (safe for frontend)
+- `VITE_API_ENV`: Environment (production/development)
+
+### Price Fetching (CoinGecko)
+- **API**: https://api.coingecko.com/api/v3
+- **Free Tier**: 10-50 requests/minute (no API key needed)
+- **Cache**: 60 seconds
+- **Update Interval**: 1 second (UI updates)
+- **KGS Rate**: 1 USD = 87 KGS
+
+### Architecture
+1. `priceService.ts` - Fetches prices from CoinGecko
+2. `appStore.ts` - Manages global state with Zustand
+3. `App.tsx` - Initializes and updates prices every second
+4. Components use `useAppStore()` to access prices
+
+---
+
+# Previous Task: Fix Token Selector - Add Missing Token Data
 
 ## Current Issue
 - Token selector bo'sh - coinlar ko'rinmayapti
