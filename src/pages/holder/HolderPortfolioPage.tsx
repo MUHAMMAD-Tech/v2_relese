@@ -12,10 +12,20 @@ export default function HolderPortfolioPage() {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [tokens, setTokens] = useState<Token[]>([]);
   const { currentHolder, prices } = useAppStore();
+  const [portfolioValue, setPortfolioValue] = useState(0);
 
+  // Load assets and tokens data
   useEffect(() => {
     loadData();
   }, [currentHolder]);
+
+  // Recalculate portfolio value when prices update
+  useEffect(() => {
+    if (assets.length > 0 && Object.keys(prices).length > 0) {
+      const total = calculateTotalValue();
+      setPortfolioValue(total);
+    }
+  }, [prices, assets]);
 
   const loadData = async () => {
     if (!currentHolder) {
@@ -50,18 +60,26 @@ export default function HolderPortfolioPage() {
 
   const calculateValue = (amount: string | number, symbol: string): number => {
     const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
-    return numAmount * getTokenPrice(symbol);
+    const price = getTokenPrice(symbol);
+    return numAmount * price;
   };
 
-  const getTotalPortfolioValue = (): number => {
+  const calculateTotalValue = (): number => {
     return assets.reduce((total, asset) => {
       return total + calculateValue(asset.amount, asset.token_symbol);
     }, 0);
   };
 
+  const getTotalPortfolioValue = (): number => {
+    return portfolioValue;
+  };
+
   const getTokenInfo = (symbol: string): Token | undefined => {
     return tokens.find(t => t.symbol === symbol);
   };
+
+  // Show loading if data is being fetched or prices haven't loaded yet
+  const isLoading = loading || (assets.length > 0 && Object.keys(prices).length === 0);
 
   if (!currentHolder) {
     return (
@@ -81,7 +99,7 @@ export default function HolderPortfolioPage() {
         </p>
       </div>
 
-      {loading ? (
+      {isLoading ? (
         <div className="space-y-4">
           <div className="grid grid-cols-1 @md:grid-cols-2 gap-4">
             <Skeleton className="h-32 w-full bg-muted" />
