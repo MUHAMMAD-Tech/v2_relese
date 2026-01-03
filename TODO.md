@@ -1,4 +1,37 @@
-# Task: Fix Holder Portfolio Price Display Issues
+# Task: Fix Token Selector - Add Missing Token Data
+
+## Current Issue
+- Token selector bo'sh - coinlar ko'rinmayapti
+- Database da token_whitelist jadvali bo'sh
+- Top 50 native coins ma'lumotlari kiritilmagan
+
+## Plan
+- [x] Create migration to insert top 50 native coins
+- [x] Insert token data with CoinGecko IDs and logos
+- [x] Test token selector functionality
+- [x] Run lint check
+
+## Changes Made
+1. **Migration 00008_insert_top_50_native_tokens.sql**: 
+   - Inserted 50 native coins with symbols, names, CoinGecko IDs, and logo URLs
+   - Includes: BTC, ETH, BNB, SOL, XRP, ADA, AVAX, DOGE, TRX, DOT, MATIC, LTC, SHIB, BCH, UNI, LINK, ATOM, XLM, XMR, ETC, NEAR, ALGO, FIL, VET, APT, HBAR, ICP, ARB, OP, INJ, SUI, TIA, SEI, FTM, AAVE, EOS, XTZ, THETA, FLOW, EGLD, SAND, MANA, AXS, ZEC, KAVA, NEO, IOTA, DASH, WAVES, ZIL
+   - Used ON CONFLICT DO NOTHING to prevent duplicates
+2. **Database Verification**: Confirmed 50 tokens successfully inserted
+3. **Lint Check**: All 96 files passed without errors
+
+## Technical Details
+**Root Cause**: The token_whitelist table was created but never populated with data. The initial migration only created the table structure without inserting any tokens.
+
+**Solution**: Created a new migration that inserts all 50 top native coins with their complete information (symbol, name, CoinGecko ID, logo URL). This data is essential for:
+- TokenSelector component to display available coins
+- Price service to fetch prices from CoinGecko API
+- Asset management and transaction features
+
+**Result**: Token selector now displays all 50 coins with logos and names. Users can search and select tokens for transactions and asset management.
+
+---
+
+# Previous Task: Fix Holder Portfolio Price Display Issues
 
 ## Current Issues
 - Holder portfolio sahifasida aktivlar narxi ko'rinmayapti
